@@ -12,6 +12,8 @@ from .decisions.graph import DecisionGraph
 from .decisions.review import ReviewQueue
 from .snapshots.master import MasterRecords
 from .snapshots.releases import Releases
+from .calibration.labels import LabelLedger
+from .calibration.calibration import Calibration
 from .contracts import fields, fail
 
 
@@ -27,6 +29,10 @@ class ResearchMesh:
         self.sources.on_change = self.graph.rebuild
         self.changes = ChangeFeed(self.store, self.sources)
         self.review = ReviewQueue(self.store, self.evidence, self.graph)
+        self.labels = LabelLedger(self.store, self.evidence)
+        self.calibration = Calibration(
+            self.store, self.labels, self.evidence, self.sources, self.review
+        )
         self.masters = MasterRecords(
             self.store, self.sources, self.normalizer, self.graph
         )
@@ -149,6 +155,25 @@ class ResearchMesh:
                     "candidate_recall",
                     "identifier_collisions",
                     "verify",
+                ],
+            ),
+            (
+                "label",
+                self.labels,
+                ["record", "withdraw", "get", "pair_view", "history", "conflicts", "stats"],
+            ),
+            (
+                "calibration",
+                self.calibration,
+                [
+                    "freeze_dataset",
+                    "get_freeze",
+                    "run_validation",
+                    "evaluate_holdout",
+                    "get_experiment",
+                    "list_experiments",
+                    "suggest_batch",
+                    "list_suggestions",
                 ],
             ),
             ("storage", self.store, ["verify_audit", "audit_page", "backup"]),

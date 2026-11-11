@@ -32,6 +32,19 @@ CREATE TABLE IF NOT EXISTS review_tasks(id TEXT PRIMARY KEY,left_key TEXT NOT NU
  owner TEXT,lease_until INTEGER NOT NULL,result TEXT);
 CREATE TABLE IF NOT EXISTS audit(seq INTEGER PRIMARY KEY AUTOINCREMENT,kind TEXT NOT NULL,entity TEXT NOT NULL,
  payload TEXT NOT NULL,previous TEXT NOT NULL,digest TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS calibration_labels(id TEXT PRIMARY KEY,pair_id TEXT NOT NULL,left_key TEXT NOT NULL,
+ right_key TEXT NOT NULL,label TEXT NOT NULL,source TEXT NOT NULL,note TEXT NOT NULL,
+ state TEXT NOT NULL,recorded_at INTEGER NOT NULL,withdrawn_at INTEGER,withdraw_reason TEXT,
+ supersedes TEXT,payload TEXT NOT NULL,digest TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS label_pair_state ON calibration_labels(pair_id,state);
+CREATE TABLE IF NOT EXISTS calibration_freeze(id TEXT PRIMARY KEY,payload TEXT NOT NULL,digest TEXT NOT NULL,
+ created_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS calibration_experiments(id TEXT PRIMARY KEY,freeze_id TEXT NOT NULL,
+ role TEXT NOT NULL,method TEXT NOT NULL,payload TEXT NOT NULL,digest TEXT NOT NULL,created_at INTEGER NOT NULL,
+ UNIQUE(freeze_id,role));
+CREATE TABLE IF NOT EXISTS calibration_suggestions(id TEXT PRIMARY KEY,batch_digest TEXT NOT NULL,
+ experiment_id TEXT NOT NULL,payload TEXT NOT NULL,digest TEXT NOT NULL,created_at INTEGER NOT NULL,
+ UNIQUE(batch_digest));
 """
 
 
